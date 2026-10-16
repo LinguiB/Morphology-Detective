@@ -61,22 +61,22 @@ button{font:inherit;cursor:pointer;color:inherit}
 <div id="view"></div>
 </div>
 <script>
-const L={P:"Prefix",R:"Free root",B:"Bound root",S:"Suffix"};
+const L={P:"Prefix",R:"Free root",B:"Latin (bound) root",S:"Suffix"};
 const WHY={P:"it can't stand alone and attaches at the front.",R:"it has meaning and can stand alone.",B:"it's a Latin chunk with meaning that can't stand alone in English.",S:"it can't stand alone and attaches at the end."};
 const CATS={all:"All words",c:"Compounds",l:"Latin roots",s:"Suffixes",p:"Prefixes"};
-const MEAN={"-duce":"lead","-ceive":"take","-cept":"take","-ject":"throw","-vert":"turn","-dict":"say","-nat":"born / life","-clude":"close","-lingu":"tongue, language","-curricul":"run, course","hale":"breathe"};
+const MEAN={"-duce":"lead","-ceive":"take","-cept":"take","-ject":"throw","-vert":"turn","-dict":"say","-nat":"born / life","-clude":"close","-lingu":"tongue, language","-curricul":"run, course","-hale":"breathe"};
 const raw=[
 ["thunderstorm","thunder:R,storm:R","c"],["weekend","week:R,end:R","c"],["classroom","class:R,room:R","c"],["bedroom","bed:R,room:R","c"],["notebook","note:R,book:R","c"],["sunflower","sun:R,flower:R","c"],["toothbrush","tooth:R,brush:R","c"],["football","foot:R,ball:R","c"],["rainbow","rain:R,bow:R","c"],["homework","home:R,work:R","c"],["bookshelf","book:R,shelf:R","c"],["raincoat","rain:R,coat:R","c"],["airport","air:R,port:R","c"],["birthday","birth:R,day:R","c"],["snowman","snow:R,man:R","c"],["moonlight","moon:R,light:R","c"],["butterfly","butter:R,fly:R","c"],
 ["reduce","re-:P,-duce:B","l"],["concept","con-:P,-cept:B","l"],["introduce","intro-:P,-duce:B","l"],["receive","re-:P,-ceive:B","l"],["nation","-nat:B,-ion:S","l"],
 ["conclusion","con-:P,-clude:B,-sion:S","s"],["reception","re-:P,-cept:B,-ion:S","s"],["happiness","happy:R,-ness:S","s"],["actor","act:R,-or:S","s"],["management","manage:R,-ment:S","s"],["friendship","friend:R,-ship:S","s"],["sisterhood","sister:R,-hood:S","s"],["happened","happen:R,-ed:S","s"],["liked","like:R,-ed:S","s"],["tasks","task:R,-s:S","s"],["cries","cry:R,-es:S","s"],["largest","large:R,-est:S","s"],["controllable","control:R,-able:S","s"],["active","act:R,-ive:S","s"],
-["rewrite","re-:P,write:R","p"],["introvert","intro-:P,-vert:B","p"],["postwar","post-:P,war:R","p"],["overreact","over-:P,re-:P,act:R","p"],["international","inter-:P,-nat:B,-ion:S,-al:S","p"],["transform","trans-:P,form:R","p"],["cowork","co-:P,work:R","p"],["disagree","dis-:P,agree:R","p"],["trilingual","tri-:P,-lingu:B,-al:S","p"],["bilingual","bi-:P,-lingu:B,-al:S","p"],["prewar","pre-:P,war:R","p"],["subvert","sub-:P,-vert:B","p"],["underestimate","under-:P,estimate:R","p"],["inhale","in-:P,hale:B","p"],["multitask","multi-:P,task:R","p"],["extracurricular","extra-:P,-curricul:B,-ar:S","p"],["supermarket","super-:P,market:R","p"],["enjoy","en-:P,joy:R","p"],["proactive","pro-:P,act:R,-ive:S","p"]];
+["rewrite","re-:P,write:R","p"],["introvert","intro-:P,-vert:B","p"],["postwar","post-:P,war:R","p"],["overreact","over-:P,re-:P,act:R","p"],["international","inter-:P,-nat:B,-ion:S,-al:S","p"],["transform","trans-:P,form:R","p"],["cowork","co-:P,work:R","p"],["disagree","dis-:P,agree:R","p"],["trilingual","tri-:P,-lingu:B,-al:S","p"],["bilingual","bi-:P,-lingu:B,-al:S","p"],["prewar","pre-:P,war:R","p"],["subvert","sub-:P,-vert:B","p"],["underestimate","under-:P,estimate:R","p"],["inhale","in-:P,-hale:B","p"],["multitask","multi-:P,task:R","p"],["extracurricular","extra-:P,-curricul:B,-ar:S","p"],["supermarket","super-:P,market:R","p"],["enjoy","en-:P,joy:R","p"],["proactive","pro-:P,act:R,-ive:S","p"],["reject","re-:P,-ject:B","l"],["inject","in-:P,-ject:B","l"],["predict","pre-:P,-dict:B","l"]];
 const D=raw.map(([w,p,c])=>({w,c,parts:p.split(",").map(x=>{const i=x.lastIndexOf(":");return[x.slice(0,i),x.slice(i+1)]})}));
 const $=id=>document.getElementById(id);
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const pills=ps=>ps.map(([t,k])=>`<span class="pill ${k}">${t}</span>`).join('<span class="plus">+</span>');
 const legend=()=>`<div class="legend">${Object.keys(L).map(k=>`<span class="pill ${k}">${L[k]}</span>`).join("")}</div>`;
 let tab="rules",cat="all";
-const pool=()=>D.filter(d=>cat==="all"||d.c===cat);
+const pool=()=>D.filter(d=>cat==="all"||(cat==="l"?d.parts.some(p=>p[1]==="B"):d.c===cat));
 function nav(){
   $("tabs").innerHTML=[["rules","📖 Rules"],["latin","🏛️ Latin roots"],["cards","🃏 Flashcards"],["practice","🎯 Practice"]].map(([k,t])=>`<button class="tab ${tab===k?"on":""}" onclick="go('${k}')">${t}</button>`).join("");
   $("chips").innerHTML=tab==="rules"||tab==="latin"?"":Object.keys(CATS).map(k=>`<button class="chip ${cat===k?"on":""}" onclick="setCat('${k}')">${CATS[k]}</button>`).join("");
@@ -88,9 +88,9 @@ function rules(){
   const tags=(a,k)=>a.map(x=>`<span class="pill ${k}">${x}</span>`).join("");
   $("view").innerHTML=legend()+`<div class="grid">
   <div class="card"><div class="big" style="color:#2EC4B6">1</div><h2>Compounds</h2><p>Two roots that each mean something on their own.</p>${pills([["thunder","R"],["storm","R"]])}<p class="muted">Nouns are morphemes that have a meaning when they stand alone.</p></div>
-  <div class="card"><div class="big" style="color:#B388EB">2</div><h2>Latin roots</h2><p>Real roots, but they can't stand alone in English.</p><div class="tags">${tags(["-duce","-ceive","-ject","-vert","-dict","-cept","-nat"],"B")}</div></div>
+  <div class="card"><div class="big" style="color:#B388EB">2</div><h2>Latin roots</h2><p>Real roots, but they can't stand alone in English.</p><div class="tags">${tags(["-duce","-ceive","-ject","-vert","-dict","-cept","-nat","-clude","-lingu","-curricul","-hale"],"B")}</div></div>
   <div class="card"><div class="big" style="color:#FF6B6B">3</div><h2>Affixes</h2><p>Prefixes and suffixes. They can't stand alone either.</p><p class="muted">Suffixes</p><div class="tags">${tags(["-er","-or","-ist","-ness","-sion","-tion","-s","-ed","-ment","-able","-hood","-ship","-est","-ive"],"S")}</div><p class="muted">Prefixes</p><div class="tags">${tags(["re-","intro-","trans-","un-","co-","im-","ir-","dis-","il-","in-","non-","de-","pre-","post-","inter-","sub-","super-","under-","over-","extra-","bi-","tri-","multi-","en-","pro-"],"P")}</div></div></div>
-  <div class="card"><h2>Ask yourself</h2><p>Can it stand alone and mean something? → <b>Free root</b><br>Two roots side by side? → <b>Compound</b><br>A Latin chunk like -duce, -ceive, -vert? → <b>Bound root</b><br>Can't stand alone in English? → <b>Affix</b></p><div class="row"><button class="btn" onclick="go('cards')">Try flashcards</button><button class="btn alt" onclick="go('practice')">Start practice</button></div></div>`;
+  <div class="card"><h2>Ask yourself</h2><p>Can it stand alone and mean something? → <b>Free root</b><br>Two roots side by side? → <b>Compound</b><br>A Latin chunk like -duce, -ceive, -vert? → <b>Latin (bound) root</b><br>Can't stand alone in English? → <b>Affix</b></p><div class="row"><button class="btn" onclick="go('cards')">Try flashcards</button><button class="btn alt" onclick="go('practice')">Start practice</button></div></div>`;
 }
 
 let fc={deck:[],flip:false,total:0};
@@ -124,14 +124,14 @@ function renderPR(){
   let fb="";
   if(pr.checked){
     const wrong=d.parts.filter((p,j)=>pr.sel[j]!==p[1]);
-    fb=`<div class="fb">${pr.ok?"✅ Perfect! ":"❌ Not quite. "}<div style="margin:6px 0">${d.w} = ${pills(d.parts)}</div>${wrong.map(([t,k])=>`<div><b>${t}</b> is a ${L[k].toLowerCase()}: ${WHY[k]}</div>`).join("")}</div>`;
+    fb=`<div class="fb">${pr.ok?"✅ Perfect! ":"❌ Not quite. "}<div style="margin:6px 0">${d.w} = ${pills(d.parts)}</div>${wrong.map(([t,k])=>`<div><b>${t}</b> → ${L[k]}: ${WHY[k]}</div>`).join("")}</div>`;
   }
   v.innerHTML=`<div class="stats"><span>Score ${pr.score}</span><span>🔥 Streak ${pr.streak}</span><span class="muted" style="margin-left:auto;font-weight:400">${pr.i+1} / ${pr.q.length}</span></div>
   <div class="card"><div class="muted">Label every piece of</div><div class="big">${d.w}</div><div class="parts">${cols}</div>
   ${pr.hint&&!pr.checked?`<div class="fb">Can it stand alone and mean something? Is it a Latin chunk like -duce or -vert? Does it attach at the front or the end?</div>`:""}${fb}
   <div class="row">${pr.checked?`<button class="btn" onclick="nextQ()">Next →</button>`:`<button class="btn" ${d.parts.every((p,j)=>pr.sel[j])?"":"disabled"} onclick="check()">Check</button><button class="btn alt" onclick="pr.hint=!pr.hint;renderPR()">💡 Hint</button>`}</div></div>${legend()}`;
 }
-const SC={lead:'<span class="slide">🧑‍✈️</span><span class="slide d1">🐑</span><span class="slide d2">🐑</span>',take:'<span>✋</span><span class="grab">🎁</span>',throw:'<span>🧑</span><span class="ball">⚾</span>',turn:'<span class="spin">🔄</span>',say:'<span>🗣️</span><span class="pop">💬</span>',born:'<span class="grow">🌱</span><span class="grow d1">👶</span>'};
+const SC={lead:'<span class="slide">🧑‍✈️</span><span class="slide d1">🐑</span><span class="slide d2">🐑</span>',take:'<span>✋</span><span class="grab">🎁</span>',throw:'<span>🧑</span><span class="ball">⚾</span>',turn:'<span class="spin">🔄</span>',say:'<span>🗣️</span><span class="pop">💬</span>',born:'<span class="grow">🌱</span><span class="grow d1">👶</span>',close:'<span>🚪</span><span class="pop">🔒</span>',lang:'<span>👅</span><span class="pop">💬</span>',run:'<span class="slide">🏃</span>',breathe:'<span class="grow">😮</span><span class="grow d1">🌬️</span>'};
 const LR=[
 {r:"-duce",m:"lead",s:"lead",hook:"A leader pulls the group along.",w:[["reduce","re- (back) + lead","lead back, bring down"],["introduce","intro- (inside) + lead","lead someone in"],["produce","pro- (forward) + lead","lead forth, make"]]},
 {r:"-ceive",m:"take",alt:"-cept",s:"take",hook:"Your hand TAKES a gift.",w:[["receive","re- (back) + take","take what comes to you"],["perceive","per- (through) + take","take in through the senses"],["conceive","con- (together) + take","take an idea in"]]},
@@ -139,9 +139,13 @@ const LR=[
 {r:"-ject",m:"throw",s:"throw",hook:"A pitcher THROWS the ball.",w:[["reject","re- (back) + throw","throw back"],["inject","in- (in) + throw","throw into"],["project","pro- (forward) + throw","throw forward"]]},
 {r:"-vert",m:"turn",s:"turn",hook:"Think of a U-turn: you TURN around.",w:[["convert","con- (with) + turn","turn into something else"],["invert","in- (in) + turn","turn upside down"],["introvert","intro- (inside) + turn","turn inward"]]},
 {r:"-dict",m:"say",s:"say",hook:"A DICTionary is full of words people SAY.",w:[["predict","pre- (before) + say","say before it happens"],["contradict","contra- (against) + say","say the opposite"],["dictate","dict (say) + -ate","say it aloud for someone to write"]]},
-{r:"-nat",m:"born / life",s:"born",hook:"PRENATAL = before birth. Native = born there.",w:[["nation","born + -ion","people born in the same place"],["native","born + -ive","born in a place"],["natural","born + -al","as it was born, by birth"]]}];
+{r:"-nat",m:"born / life",s:"born",hook:"PRENATAL = before birth. Native = born there.",w:[["nation","born + -ion","people born in the same place"],["native","born + -ive","born in a place"],["natural","born + -al","as it was born, by birth"]]},
+{r:"-clude",m:"close",s:"close",hook:"A door closes: something is shut, finished.",w:[["conclusion","con- (together) + close + -sion","closing something off, the end"]]},
+{r:"-lingu",m:"tongue, language",s:"lang",hook:"Your TONGUE is what speaks a language.",w:[["bilingual","bi- (two) + language + -al","in two languages"],["trilingual","tri- (three) + language + -al","in three languages"]]},
+{r:"-curricul",m:"run, course",s:"run",hook:"A running track: a course you run through.",w:[["extracurricular","extra- (outside) + course + -ar","outside the main course"]]},
+{r:"-hale",m:"breathe",s:"breathe",hook:"Take a deep breath in.",w:[["inhale","in- (in) + breathe","breathe in"]]}];
 function latin(){$("view").innerHTML=`<p class="muted">Each Latin root has a meaning. Watch the mini-animation, read the memory hook, then test yourself.</p><div class="grid">${LR.map(x=>`<div class="card"><span class="pill B" style="font-size:22px">${x.r}</span> <b style="font-size:20px">= ${x.m}</b>${x.alt?`<div class="muted">also spelled ${x.alt}</div>`:""}<div class="scene">${SC[x.s]}</div><p style="margin:8px 0">💡 ${x.hook}</p>${x.w.map(([w,a,b])=>`<div style="margin:6px 0"><b>${w}</b> <span class="muted">${a}</span><br>→ ${b}</div>`).join("")}</div>`).join("")}</div><div class="row"><button class="btn" onclick="startLQ()">🎯 Quiz me on meanings</button></div>`}
-const MS=["lead","take","throw","turn","say","born / life"];let lq={};
+const MS=["lead","take","throw","turn","say","born / life","close","tongue, language","run, course","breathe"];let lq={};
 function startLQ(){const q=[];LR.forEach(x=>{const mk=(t,w)=>({t,a:x.m,w,o:shuffle([x.m,...shuffle(MS.filter(m=>m!==x.m)).slice(0,3)])});q.push(mk(`What does <span class="pill B">${x.r}</span> mean?`,null));const w=x.w[Math.floor(Math.random()*x.w.length)];q.push(mk(`In <b>${w[0]}</b>, what does <span class="pill B">${x.r}</span> mean?`,w))});lq={q:shuffle(q),i:0,score:0,pick:null};renderLQ()}
 function pickL(m){if(lq.pick!==null)return;lq.pick=m;if(m===lq.q[lq.i].a)lq.score++;renderLQ()}
 function nextL(){lq.i++;lq.pick=null;renderLQ()}
